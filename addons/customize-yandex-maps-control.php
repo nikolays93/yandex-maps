@@ -8,7 +8,7 @@ class WP_Customize_Yandex_Maps_Control extends \WP_Customize_Control
     {
         parent::__construct( $manager, $id, $args );
 
-        add_action( 'customize_controls_enqueue_scripts', array(__CLASS__, 'enqueue_scripts') );
+        add_action( 'customize_controls_enqueue_scripts', array(__NAMESPACE__ . '\Utils', 'enqueue_scripts') );
     }
 
     public function render_content()
@@ -86,10 +86,5 @@ class WP_Customize_Yandex_Maps_Control extends \WP_Customize_Control
         <?php $type = WP_DEBUG ? 'text' : 'hidden'; ?>
         <input type="<?php echo $type;?>" data-id="<?php echo $this->id;?>" value="<?php echo $this->value();?>" <?php $this->link();?>>
         <?php
-    }
-
-    public static function enqueue_scripts()
-    {
-        wp_enqueue_script( 'api-maps-yandex', 'https://api-maps.yandex.ru/2.1/?lang=ru_RU', array(), '', true );
     }
 }
