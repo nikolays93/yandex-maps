@@ -25,6 +25,7 @@ class Constructor
       $defaults = array(
         'center' => array('56.852593', '53.204843'), // Ижевск
         'zoom'   => 10,
+        'height' => '400px',
         'controls' => array('zoomControl', 'searchControl'),
         );
 
