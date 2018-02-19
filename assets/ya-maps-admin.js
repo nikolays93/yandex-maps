@@ -1,5 +1,48 @@
 /* global tinyMCE */
-(function($){
+(function($) {
+    $(document).ready( function() {
+        var arrYMaps = [];
+
+        var Modal = new wp.media.view.Modal({
+            controller: { trigger: function() {} }
+        });
+
+        var ModalContent = wp.Backbone.View.extend({
+            template: wp.template( 'yandex-map-modal-content' )
+        });
+
+
+        $('#insert-yandex-map').on('click', function(event) {
+            event.preventDefault();
+
+            ymaps.ready(function() {
+                Modal.content( new ModalContent() );
+                Modal.open();
+
+                var handle = 'EditYandexMapContainer';
+                // not restart initialized map (not worked with wp.Backbone.View)
+                // if( arrYMaps[ handle ] ) return;
+
+                var valueExists = false,
+                values = [],
+                props = YandexMap.defaults,
+                value = '';
+                // input = '<?php // echo $args['inputSelector']; ?>';
+
+                if( value ) {
+                    values = value.split('|');
+                    props.center = values[0].split(',');
+                    props.zoom = values[1];
+                    valueExists = new ymaps.Placemark(props.center);
+                }
+
+                // console.log( 'initialize map: ' + handle );
+                arrYMaps[ handle ] = new ymaps.Map(handle, props);
+                // if( valueExists ) arrYMaps[ handle ].geoObjects.add( valueExists );
+            });
+        });
+    });
+
     var media = wp.media,
         typingTimer,
         shortcode_string = 'yamaps';

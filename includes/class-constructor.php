@@ -2,7 +2,6 @@
 
 namespace CDevelopers\Yandex\Map;
 
-add_action( 'wp_enqueue_scripts', array(__NAMESPACE__ . '\Constructor', '_register_ymaps_scripts') );
 class Constructor
 {
     private $map_id = '';
@@ -19,6 +18,17 @@ class Constructor
       add_action( 'wp_footer', array(self::$instance, 'footer_localize_scripts') );
 
       return self::$instance;
+    }
+
+    static function get_defaults()
+    {
+      $defaults = array(
+        'center' => array('56.852593', '53.204843'), // Ижевск
+        'zoom'   => 10,
+        'controls' => array('zoomControl', 'searchControl'),
+        );
+
+      return apply_filters( 'MapConstructor_defaults', $defaults );
     }
 
     function create_map( $map_id, Array $atts ) {

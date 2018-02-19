@@ -52,8 +52,14 @@ class Utils
 
         // includes
         // self::load_file_if_exists( $dir_include . '/register-post-type.php' );
-        // self::load_file_if_exists( $dir_include . '/admin-page.php' );
+        self::load_file_if_exists( $dir_include . '/admin.php' );
         self::load_file_if_exists( $dir_include . '/shortcode.php' );
+    }
+
+    private static function init_hooks()
+    {
+        add_action( 'wp_enqueue_scripts', array(__NAMESPACE__ . '\Constructor', '_register_ymaps_scripts') );
+        add_action( 'admin_enqueue_scripts', array(__NAMESPACE__ . '\Constructor', '_register_ymaps_scripts') );
     }
 
     public static function initialize()
@@ -64,6 +70,7 @@ class Utils
 
         load_plugin_textdomain( DOMAIN, false, DOMAIN . '/languages/' );
         self::include_required_classes();
+        self::init_hooks();
 
         self::$initialized = true;
     }
@@ -168,12 +175,6 @@ class Utils
         }
 
         return isset( self::$settings[ $prop_name ] ) ? self::$settings[ $prop_name ] : $default;
-    }
-
-    public static function get_settings( $filename, $args = array() )
-    {
-
-        return self::load_file_if_exists( self::get_plugin_dir('settings') . '/' . $filename, $args );
     }
 }
 

@@ -2,32 +2,27 @@
 
 namespace CDevelopers\Yandex\Map;
 
-function init_mce_plugin()
-{
-    /** MCE Editor */
-    if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) {
-        return;
-    }
-
-    add_action('admin_head', array( __CLASS__, 'add_mce_script' ));
-}
-
+add_action('admin_head', __NAMESPACE__ . '\add_mce_script');
 function add_mce_script()
 {
     if ( ! isset( get_current_screen()->id ) || get_current_screen()->base != 'post' ) {
         return;
     }
 
-    wp_enqueue_script( 'cd_ya_maps', plugins_url( 'assets/ya-maps-admin.js', __FILE__ ),
+    wp_enqueue_script( 'cd_ya_maps', Utils::get_plugin_url( 'assets/ya-maps-admin.js' ),
         array( 'shortcode', 'wp-util', 'jquery' ), false, true );
+    wp_enqueue_script( 'api-maps-yandex' );
+    wp_localize_script('api-maps-yandex', 'YandexMap', array('defaults' => Constructor::get_defaults()) );
 }
 
 add_action( 'media_buttons', __NAMESPACE__ . '\add_yandex_map', 12 );
 function add_yandex_map()
 {
-    printf('<a href="javascript:;" class="button button_yandex-map button_add-yandex-map">%s</a>',
-        __( "Insert Yandex map", DOMAIN ) );
-    insert_yandex_map_modal_template();
+    printf('<a href="#" class="button button-yandex-map" id="insert-yandex-map">%s</a>',
+        __( "Добавить Яндекс карту", DOMAIN ) );
+
+    Utils::load_file_if_exists(
+        Utils::get_plugin_dir() . '/templates/tmpl-yandex-map-modal-content.html' );
 }
 
 class yaMapsBulletsChanger
@@ -39,45 +34,6 @@ class yaMapsBulletsChanger
     {
         $this->handle = sanitize_text_field( $handle );
         $this->args = $this->get_defaults();
-    }
-
-    private function get_defaults()
-    {
-        $defaults = array(
-            'height' => '400px',
-            'selector' => '',
-            'inputSelector' => "[data-id=\"{$this->handle}\"]",
-            'value' => '',
-            'defaultProps' => (object) apply_filters( 'yaMapsBulletsChanger_default_props', array(
-            'center' => array('56.852593', '53.204843'), // Ижевск
-            'zoom'   => 10,
-            'controls' => array('zoomControl', 'searchControl'),
-            ) ),
-        );
-
-        return apply_filters( 'yaMapsBulletsChanger_defaults', $defaults );
-    }
-
-    public function set_args(Array $args)
-    {
-
-        $this->args = wp_parse_args( $args, $this->args );
-    }
-
-    public function get_container( $addInput = false )
-    {
-        $c = sprintf('<div id="%s" class="yandex-map-container" style="max-height: %s;height: %s;"></div>',
-            $this->handle,
-            '100%',
-            $this->args['height']);
-
-        if( true === $addInput ) {
-            $addInput = sprintf('<input type="text" data-id="%s">', $this->handle);
-        }
-
-        $c .= "\r\n {$addInput}";
-
-        return apply_filters( 'yaMapsBulletsChanger_container', $c, $addInput );
     }
 
     /**
@@ -174,47 +130,5 @@ class yaMapsBulletsChanger
         }(jQuery));
         </script>
         <?php
-    }
-}
-
-function insert_yandex_map_modal_template() {
-    $ya_map = new yaMapsBulletsChanger( 'yandex-map-bullets-changer' );
-    $ya_map->set_args(array(
-        'selector' => '.button_add-yandex-map',
-    ));
-    ?>
-    <script type="text/template" id="tmpl-yandex-map-modal-content">
-        <div class="content" style="padding: 0 15px;">
-            <div class="media-frame-title" style="left: 0">
-                <h1><?php _e('Insert Yandex Map', DOMAIN); ?></h1>
-            </div>
-            <div class="media-frame-content" style="left: 0;top: 50px;">
-                <?php echo $ya_map->get_container( true ); ?>
-            </div>
-            <div class="media-frame-toolbar" style="left: 0">
-                <div class="media-toolbar">
-                    <div class="media-toolbar-primary search-form">
-                        <button type="button" class="button media-button button-primary button-large button-insert-yandex-map">Вставить в страницу</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </script>
-    <?php
-    $ya_map->the_script();
-}
-
-add_action( 'customize_register', 'customize_register_custom_control', 7 );
-function customize_register_custom_control()
-{
-    self::load_file_if_exists(
-        self::get_plugin_dir() . '/addons/customize-yandex-maps-control.php' );
-
-    if (class_exists('\CDevelopers\Contacts\CustomControl')) {
-        new \CDevelopers\Contacts\CustomControl('company_map', array(
-            'label' => __('Your company map', DOMAIN),
-            'priority' => 35,
-            ),
-        __NAMESPACE__ . '\WP_Customize_Yandex_Maps_Control' );
     }
 }
