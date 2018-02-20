@@ -17,7 +17,7 @@ namespace CDevelopers\Yandex\Map;
 if ( ! defined( 'ABSPATH' ) )
   exit; // disable direct access
 
-const DOMAIN = 'yandex-maps';
+const DOMAIN = 'wordpress-yandex-maps';
 
 class Utils
 {

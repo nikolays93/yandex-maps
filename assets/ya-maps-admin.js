@@ -1,7 +1,59 @@
 /* global tinyMCE */
 (function($) {
     $(document).ready( function() {
-        var arrYMaps = [];
+        function YandexMapInit(handle, props, val) {
+            val = val || [];
+            arrYMaps[ handle ] = new ymaps.Map(handle, props);
+
+            if( ! val.bullets ) return;
+            $.each(val.bullets, function(index, bullet) {
+                console.log(bullet.coords);
+                placemarks[ index ] = new ymaps.Placemark(bullet.coords, {
+                    balloonContent: bullet.title
+                });
+
+                arrYMaps[ handle ].geoObjects.add( placemarks[ index ] );
+            });
+        }
+
+        function OpenYandexMapWindow(handle, props, val) {
+            val = val || [];
+            ymaps.ready(function() {
+                Modal.content( new ModalContent() );
+                Modal.open();
+
+                YandexMapInit(handle, props, val);
+
+                // create new ballon on click
+                arrYMaps[ handle ].events.add('click', function (e) {
+                    // arrYMaps[ handle ].geoObjects.removeAll();
+                    var placemark = new ymaps.Placemark( e.get('coords') );
+                    arrYMaps[ handle ].geoObjects.add( placemark );
+                    // placemark.balloon.open();
+                    // placemark.balloon.close();
+                });
+
+                // change zoom/coordinates
+                arrYMaps[ handle ].events.add('boundschange', function(e) {
+                    document.getElementsByName('center')[0].value = arrYMaps[ handle ].getCenter().join(':');
+                    document.getElementsByName('zoom')[0].value = e.get('newZoom');
+                });
+
+                var center = props.center || YandexMap.defaults.center;
+                document.getElementsByName('center')[0].value = center.join(':');
+                document.getElementsByName('zoom')[0].value   = props.zoom || YandexMap.defaults.zoom;
+                document.getElementsByName('height')[0].value = props.height || YandexMap.defaults.height;
+
+                $('.button-insert-yandex-map').on('click', function(event) {
+                    wp.mce.yamaps.submit( tinyMCE.activeEditor, {
+                        center: document.getElementsByName('center')[0].value,
+                        zoom: document.getElementsByName('zoom')[0].value,
+                        height: document.getElementsByName('height')[0].value
+                    } );
+                    Modal.close();
+                });
+            });
+        }
 
         var Modal = new wp.media.view.Modal({
             controller: { trigger: function() {} }
@@ -11,138 +63,100 @@
             template: wp.template( 'yandex-map-modal-content' )
         });
 
+        var arrYMaps = [];
+        var placemarks = [];
+
+        var shortcode_string = 'yamaps';
+
+        wp.mce = wp.mce || {};
+        wp.mce.yamaps = {
+            findSubShortcodes: function(shortcode, content, subShortcodes) {
+                subShortcodes = subShortcodes || [];
+                var subShortcode = wp.shortcode.next(shortcode, content);
+
+                if( subShortcode && subShortcode.content ) {
+                    var before = content;
+                    content = content.replace(subShortcode.content, '');
+                    subShortcodes.push( subShortcode );
+
+                    if( before != content )
+                        return this.findSubShortcodes( shortcode, content, subShortcodes );
+                }
+
+                return subShortcodes;
+            },
+            getContent: function() {
+                // Контент внутри объекта
+                return '<p style="text-align: center;">[Yandex Карта]</p>';
+            },
+            edit: function( data ) {
+                var shortcode_data = wp.shortcode.next(shortcode_string, data);
+                var values = shortcode_data.shortcode.attrs.named;
+                var val = {bullets: []};
+
+                // parse bullets
+                $.each(this.findSubShortcodes('ya_bullet', shortcode_data.shortcode.content), function(index, el) {
+                    val.bullets.push( {
+                        coords: el.shortcode.attrs.named.coords.split(':'),
+                        title: el.shortcode.attrs.named.title || ''
+                    } );
+                });
+
+                // init modal
+                OpenYandexMapWindow('EditYandexMapContainer', {
+                    center: values.center ? values.center.split(':') : YandexMap.defaults.center,
+                    zoom: values.zoom || YandexMap.defaults.zoom,
+                    height: values.height || YandexMap.defaults.height,
+                    controls: YandexMap.defaults.controls
+                }, val);
+            },
+            submit: function(editor, values) {
+                values = values || [];
+
+                var content = '';
+                var args = {
+                    tag : shortcode_string,
+                    attrs : {
+                        zoom : values.zoom,
+                        center : values.center,
+                        height: values.height,
+                    }
+                };
+
+                arrYMaps[ 'EditYandexMapContainer' ].geoObjects.each(function(geoObject) {
+                    content += wp.shortcode.string( {
+                        tag: 'ya_bullet',
+                        type: 'single',
+                        attrs : {
+                            title: geoObject.properties.get('balloonContent') || '',
+                            coords: geoObject.geometry.getCoordinates().join(':'),
+                        }
+                    } );
+                });
+
+                args.content = content;
+                editor.insertContent( wp.shortcode.string( args ) );
+            }
+        };
+
+
+        // $.each(yamaps_props, YandexMapInit(handle, val) );
 
         $('#insert-yandex-map').on('click', function(event) {
             event.preventDefault();
 
-            ymaps.ready(function() {
-                Modal.content( new ModalContent() );
-                Modal.open();
-
-                var handle = 'EditYandexMapContainer';
-                // not restart initialized map (not worked with wp.Backbone.View)
-                // if( arrYMaps[ handle ] ) return;
-
-                var valueExists = false,
-                values = [],
-                props = YandexMap.defaults,
-                value = '';
-                // input = '<?php // echo $args['inputSelector']; ?>';
-
-                if( value ) {
-                    values = value.split('|');
-                    props.center = values[0].split(',');
-                    props.zoom = values[1];
-                    valueExists = new ymaps.Placemark(props.center);
-                }
-
-                // console.log( 'initialize map: ' + handle );
-                arrYMaps[ handle ] = new ymaps.Map(handle, props);
-                // if( valueExists ) arrYMaps[ handle ].geoObjects.add( valueExists );
-            });
+            OpenYandexMapWindow('EditYandexMapContainer', YandexMap.defaults, {});
         });
+
+        wp.mce.views.register( shortcode_string, wp.mce.yamaps );
+
+        // change coords with update zoom
+        // arrYMaps[ handle ].events.add('balloonopen', function(e) {
+        //     var coords = e.get( 'target' ).geometry.getCoordinates();
+        //     console.log(coords + '|' + arrYMaps[ handle ].getZoom());
+        //     $( input )
+        //     .val( coords + '|' + arrYMaps[ handle ].getZoom() )
+        //     .trigger('change');
+        // });
     });
-
-    var media = wp.media,
-        typingTimer,
-        shortcode_string = 'yamaps';
-
-    wp.mce = wp.mce || {};
-
-    wp.mce.cd_ya_maps = {
-        shortcode_data: {},
-        getContent: function() {
-            // Контент внутри объекта
-            return '<p style="text-align: center;">[Yandex Карта]</p>';
-        },
-        edit: function( data ) {
-            var shortcode_data = wp.shortcode.next(shortcode_string, data);
-            var values = shortcode_data.shortcode.attrs.named;
-            values.address = 'Оставьте пустым, если не хотите изменять';
-
-            wp.mce.cd_ya_maps.popupwindow(tinyMCE.activeEditor, values);
-        },
-        popupwindow: function(editor, values, body_type){
-            values = values || [];
-            if( typeof onsubmit_callback !== 'function' ) {
-                onsubmit_callback = function( e ) {
-                    // Insert content when the window form is submitted
-                    var args = {
-                            tag     : shortcode_string,
-                            type    : 'single',
-                            attrs : {
-                                title : e.data.title,
-                                coords : values.coords
-                            }
-                        };
-
-                    if( e.data.zoom && e.data.zoom != '12' ) {
-                        args.attrs.zoom = e.data.zoom;
-                    }
-
-                    if( e.data.height && e.data.height != '400' ) {
-                        args.attrs.height = e.data.height;
-                    }
-
-                    editor.insertContent( wp.shortcode.string( args ) );
-                };
-            }
-
-            editor.windowManager.open( {
-                title: 'Yandex Карта',
-                body: [
-                {
-                    type: 'textbox',
-                    name: 'address',
-                    label: 'Введите адреc',
-                    value: values.address,
-                    onkeyup: function(e) {
-                        clearTimeout(typingTimer);
-                        typingTimer = setTimeout(function(){
-                            if( e.target.value ) {
-                                var ajaxdata = {
-                                    action: 'AJAX_ACTION_NAME',
-                                    // nonce: AJAX_VAR.nonce,
-                                    value: e.target.value
-                                };
-
-                                $.post(ajaxurl, ajaxdata, function(data, textStatus, xhr) {
-                                    var data = JSON.parse( data );
-
-                                    e.target.value = data.address;
-                                    values.coords  = data.coordinates[0] + ' ' + data.coordinates[1];
-                                });
-                            }
-                        }, 5000);
-                    },
-                    onkeydown: function(e) {
-                        clearTimeout(typingTimer);
-                    }
-                },
-                {
-                    type: 'textbox',
-                    name: 'title',
-                    label: 'Заголовок',
-                    value: values.title,
-                },
-                {
-                    type: 'textbox',
-                    name: 'zoom',
-                    label: 'Увеличение',
-                    value: values.zoom || 12,
-                },
-                {
-                    type: 'textbox',
-                    name: 'height',
-                    label: 'Высота блока',
-                    value: values.height || 400
-                }
-                ],
-                onsubmit: onsubmit_callback
-            } );
-        }
-    };
-
-    wp.mce.views.register( shortcode_string, wp.mce.cd_ya_maps );
-
 }(jQuery));

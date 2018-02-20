@@ -7,8 +7,9 @@
             ymaps.ready(function() {
                 arrYMaps[ handle ] = new ymaps.Map(handle, {
                     center: val.center,
-                    zoom: val.zoom,
-                    controls: ['zoomControl', 'searchControl']
+                    zoom: val.zoom
+                    // ,
+                    // controls: ['zoomControl', 'searchControl']
                 });
 
                 $.each(val.bullets, function(index, bullet) {
