@@ -1,6 +1,6 @@
 <?php
 
-namespace CDevelopers\Yandex\Map;
+namespace NikolayS93\YandexMaps;
 
 class WP_Customize_Yandex_Maps_Control extends \WP_Customize_Control
 {
@@ -86,5 +86,20 @@ class WP_Customize_Yandex_Maps_Control extends \WP_Customize_Control
         <?php $type = WP_DEBUG ? 'text' : 'hidden'; ?>
         <input type="<?php echo $type;?>" data-id="<?php echo $this->id;?>" value="<?php echo $this->value();?>" <?php $this->link();?>>
         <?php
+    }
+}
+
+add_action( 'customize_register', 'customize_register_custom_control', 7 );
+function customize_register_custom_control()
+{
+    Utils::load_file_if_exists(
+        Utils::get_plugin_dir() . '/addons/customize-yandex-maps-control.php' );
+
+    if (class_exists('\CDevelopers\Contacts\CustomControl')) {
+        new \CDevelopers\Contacts\CustomControl('company_map', array(
+            'label' => __('Your company map', DOMAIN),
+            'priority' => 35,
+            ),
+        __NAMESPACE__ . '\WP_Customize_Yandex_Maps_Control' );
     }
 }

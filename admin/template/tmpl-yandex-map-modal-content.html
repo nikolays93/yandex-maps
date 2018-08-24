@@ -1,0 +1,138 @@
+<script type="text/template" id="tmpl-yandex-map-modal-content">
+    <div class="content" style="padding: 0 15px;">
+        <div class="media-frame-title" style="left: 0">
+            <h1>Изменить/Добавить Яндекс карту</h1>
+        </div>
+        <div id="EditYandexMapContainer" class="media-frame-content yandex-map-container" style="left: 0;top: 50px;">
+            <div id="EditYandexMapSidebar" class="media-sidebar" style="display: none;">
+                <div class="media-sidebar visible">
+                    <button type="button" class="media-modal-close media-sidebar-close"><span class="media-modal-icon"></span></button>
+
+                    <h2>Настройки метки</h2>
+
+                    <label class="setting align">
+                        <span>Заголовок</span>
+                        <input type="text" name="balloonContentHeader">
+                    </label>
+
+                    <label class="setting align">
+                        <span>Контент метки</span>
+                        <textarea name="balloonContentBody"></textarea>
+                    </label>
+
+                    <label class="setting align">
+                        <span>Подвал метки</span>
+                        <textarea name="balloonContentFooter"></textarea>
+                    </label>
+
+                    <label class="setting align">
+                        <span>Цвет</span>
+                        <select name="iconColor">
+                            <option value="#ff0000">Красный</option>
+                            <option value="#14B278">Зелёный</option>
+                            <option value="#1E98FF">Синий</option>
+                        </select>
+                    </label>
+
+                    <label class="setting align">
+                        <span>Открытая</span>
+                        <input type="checkbox" name="opened">
+                    </label>
+
+                    <!-- Надеюсь это временная мера -->
+                    <style>
+                        .button-sidebar-delete {
+                            position: absolute;
+                            right: 50px;
+                            top: 0;
+                            line-height: 48px;
+                        }
+                        #controls {
+                            position: relative;
+                        }
+                        #controls-pane {
+                            position: absolute;
+                            left: 0;
+                            right: 0;
+                            bottom: 36px;
+                            padding: 8px;
+                            background-color: #fff;
+                        }
+                        #controls-pane label {
+                            display: block;
+                            margin: 4px 0;
+                        }
+                    </style>
+                    <button type="button" class="button-link button-sidebar-delete delete-attachment" style="display: none;">Удалить</button>
+                </div>
+            </div>
+        </div>
+        <div class="media-frame-toolbar" style="left: 0">
+            <div class="media-toolbar">
+                <div class="media-toolbar-secondary">
+                    <div class="media-button-group">
+                        <input type="hidden" name="center" class="hidden">
+                        <label>
+                            <span>Высота карты</span>
+                            <input type="text" name="height" class="button" style="vertical-align: middle; margin: 0 15px 0 5px">
+                        </label>
+                        <label>
+                            <span>Приближение</span>
+                            <input readonly="true" type="number" name="zoom" class="button" style="vertical-align: middle; margin: 0 15px 0 5px">
+                        </label>
+                        <span id="controls">
+                            <label>
+                                <span>Элементы управления</span>
+                                <button type="button" class="button" style="vertical-align: middle; margin: 0 15px 0 5px">Выбрать</button>
+                                <div id="controls-pane" style="display: none;">
+                                    <label class="setting align">
+                                        <input type="checkbox" name="fullscreenControl">
+                                        <span>На весь экран</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="geolocationControl">
+                                        <span>Где я?</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="routeEditor">
+                                        <span>Редактор маршрута</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="rulerControl">
+                                        <span>Линейка</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="searchControl">
+                                        <span>Поиск</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="trafficControl">
+                                        <span>Пробки</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="typeSelector">
+                                        <span>Тип карты</span>
+                                    </label>
+
+                                    <label class="setting align">
+                                        <input type="checkbox" name="zoomControl">
+                                        <span>Масштаб</span>
+                                    </label>
+                                </div>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+                <div class="media-toolbar-primary search-form">
+                    <button type="button" class="button media-button button-primary button-large button-insert-yandex-map">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
