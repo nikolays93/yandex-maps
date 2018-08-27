@@ -120,6 +120,7 @@ class Plugin
          */
         wp_enqueue_script( 'yamaps', Utils::get_plugin_url( '/admin/assets/yandex-maps-admin.js' ),
             array( 'shortcode', 'wp-util', 'jquery', Map::APINAME ), false, true );
+        wp_enqueue_style( 'yamaps-style', Utils::get_plugin_url('/admin/assets/yandex-maps-admin.css'));
 
         /**
          * Exchange admin script properties
