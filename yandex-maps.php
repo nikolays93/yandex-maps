@@ -14,13 +14,6 @@
  * Domain Path: /languages/
  */
 
-/**
- * Фильтры плагина:
- * "get_{Text Domain}_option_name" - имя опции плагина
- * "get_{Text Domain}_option" - значение опции плагина
- * "get_{Text Domain}_plugin_url" - УРЛ плагина
- */
-
 namespace NikolayS93\YandexMaps;
 
 if ( ! defined( 'ABSPATH' ) )
@@ -39,18 +32,11 @@ class Plugin
 
     private function __construct() {}
 
-    // static function activate() { add_option( self::get_option_name(), array() ); }
-    // static function uninstall() { delete_option( self::get_option_name() ); }
-
-    /**
-     * Получает название опции плагина
-     *     Чаще всего это название плагина
-     *     Чаще всего оно используется как название страницы настроек
-     * @return string
-     */
-    public static function get_option_name()
+    public static function get_plugin_url( $path = '' )
     {
-        return apply_filters("get_{DOMAIN}_option_name", DOMAIN);
+        $url = plugins_url( basename(PLUGIN_DIR) ) . $path;
+
+        return apply_filters( "get_{DOMAIN}_plugin_url", $url, $path );
     }
 
     public static function get_shortcode_name()
@@ -73,7 +59,6 @@ class Plugin
     {
         load_plugin_textdomain(DOMAIN, false, basename(PLUGIN_DIR) . '/languages/');
 
-        require PLUGIN_DIR . '/include/utils.php';
         require_once PLUGIN_DIR . '/include/class/map.php';
 
         include PLUGIN_DIR . '/include/shortcode.php';
@@ -116,11 +101,16 @@ class Plugin
         wp_enqueue_script( Map::APINAME );
 
         /**
-         * Enqueue admin script
+         * Init Construct Yandex Map Method
          */
-        wp_enqueue_script( 'yamaps', Utils::get_plugin_url( '/admin/assets/yandex-maps-admin.js' ),
+        wp_enqueue_script( Map::PUBLICNAME );
+
+        /**
+         * Enqueue Admin Script
+         */
+        wp_enqueue_script( 'yamaps', self::get_plugin_url( '/admin/assets/yandex-maps-admin.js' ),
             array( 'shortcode', 'wp-util', 'jquery', Map::APINAME ), false, true );
-        wp_enqueue_style( 'yamaps-style', Utils::get_plugin_url('/admin/assets/yandex-maps-admin.css'));
+        wp_enqueue_style( 'yamaps-style', self::get_plugin_url('/admin/assets/yandex-maps-admin.css'));
 
         /**
          * Exchange admin script properties
@@ -134,7 +124,7 @@ class Plugin
             return false;
 
         $api = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
-        $public = Utils::get_plugin_url('/yandex-maps-public.js');
+        $public = self::get_plugin_url('/yandex-maps-public.js');
 
         wp_register_script( Map::APINAME, $api, array(), '', true );
         wp_register_script( Map::PUBLICNAME, $public, array('jquery'), '', true );
@@ -142,9 +132,5 @@ class Plugin
 }
 
 Plugin::define();
-
-// register_activation_hook( __FILE__, array( __NAMESPACE__ . '\Plugin', 'activate' ) );
-// register_uninstall_hook( __FILE__, array( __NAMESPACE__ . '\Plugin', 'uninstall' ) );
-// register_deactivation_hook( __FILE__, array( __NAMESPACE__ . '\Plugin', 'deactivate' ) );
 
 add_action( 'plugins_loaded', array( __NAMESPACE__ . '\Plugin', 'initialize' ), 10 );
