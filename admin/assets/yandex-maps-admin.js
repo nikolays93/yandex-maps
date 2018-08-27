@@ -13,6 +13,20 @@
             }
         }
 
+        function YandexMapInit(handle, props, val) {
+            val = val || [];
+            arrYMaps[ handle ] = new ymaps.Map(handle, props);
+
+            if( ! val.bullets ) return;
+            $.each(val.bullets, function(index, bullet) {
+                placemarks[ index ] = new ymaps.Placemark(bullet.coords, {
+                    balloonContent: bullet.title
+                });
+
+                arrYMaps[ handle ].geoObjects.add( placemarks[ index ] );
+            });
+        }
+
         var Modal = new wp.media.view.Modal({
             controller: { trigger: function() {} }
         });
@@ -120,20 +134,6 @@
             }
         }
 
-        function YandexMapInit(handle, props, val) {
-            val = val || [];
-            arrYMaps[ handle ] = new ymaps.Map(handle, props);
-
-            if( ! val.bullets ) return;
-            $.each(val.bullets, function(index, bullet) {
-                placemarks[ index ] = new ymaps.Placemark(bullet.coords, {
-                    balloonContent: bullet.title
-                });
-
-                arrYMaps[ handle ].geoObjects.add( placemarks[ index ] );
-            });
-        }
-
         function OpenYandexMapWindow(handle, props, val) {
             val = val || [];
 
@@ -195,8 +195,19 @@
                 document.getElementsByName('height')[0].value = props.height || YandexMap.defaults.height;
 
                 var $controlsPane = $('#controls-pane');
-                $('#controls').on('click', function(event) {
+                $('#controls button').on('click', function(event) {
                     $controlsPane.fadeToggle();
+                });
+
+                $('input', $controlsPane).on('change', function(event) {
+                    event.preventDefault();
+
+                    if( $(this).is(':checked') ) {
+                        arrYMaps[ handle ].controls.add( $(this).attr('name') );
+                    }
+                    else {
+                        arrYMaps[ handle ].controls.remove( $(this).attr('name') );
+                    }
                 });
 
                 var controls = $.map(arrYMaps[ handle ].controls[ '_controlKeys' ], function(item, index) {
