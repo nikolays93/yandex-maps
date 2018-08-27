@@ -2,6 +2,17 @@
 (function($) {
     $(document).ready( function() {
 
+        function tmce_insertContent(content, editor_id, textarea_id) {
+            if ( typeof editor_id == 'undefined' ) editor_id = wpActiveEditor;
+            if ( typeof textarea_id == 'undefined' ) textarea_id = editor_id;
+
+            if ( jQuery('#wp-'+editor_id+'-wrap').hasClass('tmce-active') && tinyMCE.get(editor_id) ) {
+                return tinyMCE.get(editor_id).insertContent(content);
+            } else {
+                return jQuery('#'+textarea_id).val(jQuery('#'+textarea_id).val() + content);
+            }
+        }
+
         var Modal = new wp.media.view.Modal({
             controller: { trigger: function() {} }
         });
@@ -303,7 +314,13 @@
                 });
 
                 args.content = content;
-                editor.insertContent( wp.shortcode.string( args ) );
+
+                if( editor ) {
+                    editor.insertContent( wp.shortcode.string( args ) );
+                }
+                else {
+                    tmce_insertContent(wp.shortcode.string( args ));
+                }
             }
         };
 
