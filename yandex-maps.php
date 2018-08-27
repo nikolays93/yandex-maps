@@ -115,7 +115,7 @@ class Plugin
         /**
          * Exchange admin script properties
          */
-        wp_localize_script( 'yamaps', 'YandexMap', array('defaults' => Map::_def()) );
+        wp_localize_script( 'yamaps', 'yandex_maps', array('EditYandexMapContainer' => Map::_def()) );
     }
 
     static function register_scripts()
