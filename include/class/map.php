@@ -45,11 +45,12 @@ class Map
     static function _def()
     {
         $defaults = array(
-            'center' => array('56.852593', '53.204843'), // Ижевск
-            'zoom'   => 10,
-            'height' => '400px',
+            'center'   => array('56.852593', '53.204843'), // Ижевск
+            'zoom'     => 10,
+            'width'    => '100%',
+            'height'   => '400px',
             'controls' => array('zoomControl', 'searchControl'),
-            'bullets' => array(),
+            'bullets'  => array(),
         );
 
         return apply_filters( 'yandex_maps_defaults', $defaults );
@@ -71,6 +72,10 @@ class Map
 
     public function create_map( $map_id, $atts = array() )
     {
+        if( is_string($atts['center']) && false !== strpos($atts['center'], ':') ) {
+            $atts['center'] = explode(":", $atts['center']);
+        }
+
         $this->lastmap_id = esc_attr( $map_id );
         $this->ymaps[ $this->lastmap_id ] = wp_parse_args($atts, self::_def());
     }

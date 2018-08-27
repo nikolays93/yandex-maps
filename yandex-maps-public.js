@@ -8,8 +8,7 @@
                 arrYMaps[ handle ] = new ymaps.Map(handle, {
                     center: val.center,
                     zoom: val.zoom,
-                    controls: [],
-                    // controls: ['fullscreenControl', 'geolocationControl', 'routeEditor', 'rulerControl', 'searchControl', 'trafficControl', 'routeEditor', 'typeSelector', 'zoomControl']
+                    controls: val.controls.split(','),
                 });
 
                 $.each(val.bullets, function(index, bullet) {

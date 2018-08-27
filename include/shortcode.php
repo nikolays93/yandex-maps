@@ -6,19 +6,16 @@ namespace NikolayS93\YandexMaps;
  * Shortcodes
  */
 function register_shortcode_yamaps( $atts = array(), $content = '' ) {
-    $atts = shortcode_atts( array(
-        'id'     => '',
-        'center' => '56.852593:53.204843',
-        'zoom'   => '12',
-        'width'  => '100%',
-        'height' => '400px',
-    ), $atts, Plugin::get_shortcode_name() );
+    $atts = shortcode_atts(
+        array_merge(array('id' => ''), Map::_def()),
+        $atts,
+        Plugin::get_shortcode_name()
+    );
 
     if( !$atts['center'] || false === strpos($atts['center'], ':') )
         return false;
 
     if( !$atts['id'] ) $atts['id'] = 'singleton';
-    $atts['center'] = explode(":", $atts['center']);
 
     $ymaps = Map::get_instance();
     $ymaps->create_map($atts['id'], $atts);

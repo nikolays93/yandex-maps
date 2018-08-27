@@ -2,6 +2,8 @@
 (function($) {
     $(document).ready( function() {
 
+        const shortcode_string = 'yamap';
+
         function tmce_insertContent(content, editor_id, textarea_id) {
             if ( typeof editor_id == 'undefined' ) editor_id = wpActiveEditor;
             if ( typeof textarea_id == 'undefined' ) textarea_id = editor_id;
@@ -17,13 +19,19 @@
             val = val || [];
             arrYMaps[ handle ] = new ymaps.Map(handle, props);
 
-            if( ! val.bullets ) return;
-            $.each(val.bullets, function(index, bullet) {
-                placemarks[ index ] = new ymaps.Placemark(bullet.coords, {
-                    balloonContent: bullet.title
-                });
+            // if( ! val.bullets ) return;
+            // $.each(val.bullets, function(index, bullet) {
+            //     placemarks[ index ] = new ymaps.Placemark(bullet.coords, {
+            //         balloonContent: bullet.title
+            //     });
 
-                arrYMaps[ handle ].geoObjects.add( placemarks[ index ] );
+            //     arrYMaps[ handle ].geoObjects.add( placemarks[ index ] );
+            // });
+        }
+
+        function getControls(ymap) {
+            return $.map(ymap.controls[ '_controlKeys' ], function(item, index) {
+                return item;
             });
         }
 
@@ -162,14 +170,7 @@
                 // create new ballon on click
                 arrYMaps[ handle ].events.add('click', function(e) {
 
-                    var placemark = new ymaps.Placemark( e.get('coords'), {
-                        // iconContent: '',
-                        // hintContent: '',
-                        // balloonContent: '',
-                        // balloonContentHeader: '',
-                        // balloonContentBody: '',
-                        // balloonContentFooter: '',
-                    } );
+                    var placemark = new ymaps.Placemark( e.get('coords') );
 
                     arrYMaps[ handle ].geoObjects.add( placemark );
 
@@ -210,20 +211,14 @@
                     }
                 });
 
-                var controls = $.map(arrYMaps[ handle ].controls[ '_controlKeys' ], function(item, index) {
-                    return item;
-                });
-
+                var controls = getControls( arrYMaps[ handle ] );
                 $('input', $controlsPane).each(function(index, el) {
                     var $self = $(this);
 
-                    console.log($self.attr('name'), $.inArray($self.attr('name'), controls));
                     if(-1 !== $.inArray($self.attr('name'), controls) ) {
                         $self.prop('checked', true);
                     }
                 });
-
-                console.log(controls);
 
                 $('.button-insert-yandex-map').on('click', function(event) {
                     wp.mce.yamap.submit( tinyMCE.activeEditor, {
@@ -239,50 +234,48 @@
         var arrYMaps = [];
         var placemarks = [];
 
-        var shortcode_string = 'yamap';
-
         wp.mce = wp.mce || {};
         wp.mce.yamap = {
-            findSubShortcodes: function(shortcode, content, subShortcodes) {
-                subShortcodes = subShortcodes || [];
-                var subShortcode = wp.shortcode.next(shortcode, content);
+            // findSubShortcodes: function(shortcode, content, subShortcodes) {
+            //     subShortcodes = subShortcodes || [];
+            //     var subShortcode = wp.shortcode.next(shortcode, content);
 
-                if( subShortcode && subShortcode.content ) {
-                    var before = content;
-                    content = content.replace(subShortcode.content, '');
-                    subShortcodes.push( subShortcode );
+            //     if( subShortcode && subShortcode.content ) {
+            //         var before = content;
+            //         content = content.replace(subShortcode.content, '');
+            //         subShortcodes.push( subShortcode );
 
-                    if( before != content )
-                        return this.findSubShortcodes( shortcode, content, subShortcodes );
-                }
+            //         if( before != content )
+            //             return this.findSubShortcodes( shortcode, content, subShortcodes );
+            //     }
 
-                return subShortcodes;
-            },
+            //     return subShortcodes;
+            // },
             getContent: function() {
                 // Контент внутри объекта
                 return '<p style="text-align: center;">[Yandex Карта]</p>';
             },
-            edit: function( data ) {
-                var shortcode_data = wp.shortcode.next(shortcode_string, data);
-                var values = shortcode_data.shortcode.attrs.named;
-                var val = {bullets: []};
+            // edit: function( data ) {
+                // var shortcode_data = wp.shortcode.next(shortcode_string, data);
+                // var values = shortcode_data.shortcode.attrs.named;
+                // var val = {bullets: []};
 
-                // parse bullets
-                $.each(this.findSubShortcodes('bullet', shortcode_data.shortcode.content), function(index, el) {
-                    val.bullets.push( {
-                        coords: el.shortcode.attrs.named.coords.split(':'),
-                        title: el.shortcode.attrs.named.title || ''
-                    } );
-                });
+                // // parse bullets
+                // $.each(this.findSubShortcodes('bullet', shortcode_data.shortcode.content), function(index, el) {
+                //     val.bullets.push( {
+                //         coords: el.shortcode.attrs.named.coords.split(':'),
+                //         title: el.shortcode.attrs.named.title || ''
+                //     } );
+                // });
 
-                // init modal
-                OpenYandexMapWindow('EditYandexMapContainer', {
-                    center: values.center ? values.center.split(':') : YandexMap.defaults.center,
-                    zoom: values.zoom || YandexMap.defaults.zoom,
-                    height: values.height || YandexMap.defaults.height,
-                    controls: YandexMap.defaults.controls
-                }, val);
-            },
+                // // init modal
+                // OpenYandexMapWindow('EditYandexMapContainer', {
+                //     center: values.center ? values.center.split(':') : YandexMap.defaults.center,
+                //     zoom: values.zoom || YandexMap.defaults.zoom,
+                //     height: values.height || YandexMap.defaults.height,
+                //     controls: YandexMap.defaults.controls
+                // }, val);
+            // },
             submit: function(editor, values) {
                 values = values || [];
 
@@ -295,6 +288,11 @@
                         height: values.height,
                     }
                 };
+
+                var controls = getControls( arrYMaps[ 'EditYandexMapContainer' ] );
+                if( controls.join(',') != 'zoomControl,searchControl' ) {
+                    args.attrs.controls = controls.join(',');
+                }
 
                 arrYMaps[ 'EditYandexMapContainer' ].geoObjects.each(function(geoObject) {
 
@@ -326,12 +324,7 @@
 
                 args.content = content;
 
-                if( editor ) {
-                    editor.insertContent( wp.shortcode.string( args ) );
-                }
-                else {
-                    tmce_insertContent(wp.shortcode.string( args ));
-                }
+                tmce_insertContent(wp.shortcode.string( args ));
             }
         };
 
