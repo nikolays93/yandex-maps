@@ -1,0 +1,31 @@
+{
+    "_require": {
+        "nikolays93/wp-admin-form": "dev-master",
+        "nikolays93/wp-admin-page": "dev-master",
+        "nikolays93/wp-post-metabox": "dev-master",
+        "nikolays93/wp-admin-table": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "NikolayS93\\YandexMaps\\": "include"
+        }
+    },
+    "_repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/nikolays93/wp-admin-form"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/nikolays93/wp-admin-page"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/nikolays93/wp-post-metabox"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/nikolays93/wp-admin-table"
+        }
+    ]
+}
