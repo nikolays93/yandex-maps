@@ -3,7 +3,6 @@ var el = wp.element.createElement,
     RichText = wp.editor.RichText;
 
 registerBlockType( 'my-gutenberg/my-first-block', {
-
     title: 'My First Block',
 
     description: 'Description',
@@ -15,19 +14,14 @@ registerBlockType( 'my-gutenberg/my-first-block', {
     },
 
     attributes: {
-        // content: {
-        //     type: 'array',
-        //     source: 'children',
-        //     selector: 'p',
-        // }
         content: {
-            source: 'attribute',
-            selector: 'a',
-            attribute: 'title'
+            type: 'array',
+            source: 'children',
+            selector: 'div.yamap',
         }
     },
 
-    category: 'widgets',
+    category: 'common',
 
     edit: function( props ) {
         var content = props.attributes.content;
@@ -39,8 +33,8 @@ registerBlockType( 'my-gutenberg/my-first-block', {
         return el(
             RichText,
             {
-                tagName: 'p',
-                className: props.className,
+                tagName: 'div',
+                className: 'yamap', // props.className
                 onChange: onChangeContent,
                 value: content,
             }
@@ -50,10 +44,14 @@ registerBlockType( 'my-gutenberg/my-first-block', {
     save: function( props ) {
         var content = props.attributes.content;
 
+        console.log(props.className);
+
         return el( RichText.Content, {
-            tagName: 'p',
+            tagName: 'div',
             className: props.className,
             value: content
         } );
     },
 } );
+
+OpenYandexMapWindow(0, {});

@@ -239,13 +239,15 @@
             });
         }
 
-        $('#insert-yandex-map').on('click', function(event) {
-            event.preventDefault();
+        // $('#insert-yandex-map').on('click', function(event) {
+            // event.preventDefault();
 
             $.each(yandex_maps, function(handle, properties) {
                 OpenYandexMapWindow(handle, properties);
             });
-        });
+        // });
+
+        try {
 
         /**
          * Shortcode
@@ -348,5 +350,10 @@
         };
 
         wp.mce.views.register( shortcode_string, wp.mce.yamap );
+
+        } catch(e) {
+            // statements
+            console.log(e);
+        }
     });
 }(jQuery));

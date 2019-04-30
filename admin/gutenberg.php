@@ -27,7 +27,7 @@ function my_custom_block_for_gutenberg() {
     // ) );
 }
 
-add_action('admin_head', __NAMESPACE__ . '\add_gutenberg_script');
+// add_action('admin_head', __NAMESPACE__ . '\add_gutenberg_script');
 function add_gutenberg_script()
 {
     $screen = get_current_screen();
@@ -46,6 +46,7 @@ function add_gutenberg_script()
     /**
      * Enqueue Admin Script
      */
+    wp_enqueue_script( 'yamap-modal', Plugin::get_plugin_url( '/admin/assets/mce.js' ), array(), false, true );
     wp_enqueue_script( 'yamaps', Plugin::get_plugin_url( '/admin/assets/gutenberg.js' ),
         array( 'wp-blocks', 'wp-element', 'wp-components', 'shortcode', 'wp-util', 'jquery', Plugin::APINAME ), false, true );
     wp_enqueue_style( 'yamaps-style', Plugin::get_plugin_url('/admin/assets/gutenberg.css'));
