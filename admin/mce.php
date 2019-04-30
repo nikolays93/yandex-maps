@@ -1,9 +1,11 @@
 <?php
 
+namespace NikolayS93\YandexMaps;
+
 /**
  * MCE Editor
  */
-add_action('admin_head', array(__CLASS__, 'add_mce_script'));
+add_action('admin_head', __NAMESPACE__ . '\add_mce_script');
 function add_mce_script()
 {
     $screen = get_current_screen();
@@ -12,27 +14,29 @@ function add_mce_script()
     /**
      * Enqueue Yandex Map API
      */
-    wp_enqueue_script( YandexMap::APINAME );
+    wp_enqueue_script( Plugin::APINAME );
 
     /**
      * Init Construct Yandex Map Method
      */
-    wp_enqueue_script( YandexMap::PUBLICNAME );
+    wp_enqueue_script( Plugin::PUBLICNAME );
 
     /**
      * Enqueue Admin Script
      */
     wp_enqueue_script( 'yamaps', Plugin::get_plugin_url( '/admin/assets/mce.js' ),
-        array( 'shortcode', 'wp-util', 'jquery', Map::APINAME ), false, true );
+        array( 'shortcode', 'wp-util', 'jquery', Plugin::APINAME ), false, true );
     wp_enqueue_style( 'yamaps-style', Plugin::get_plugin_url('/admin/assets/mce.css'));
 
     /**
      * Exchange admin script properties
      */
-    wp_localize_script( 'yamaps', 'yandex_maps', array('EditYandexMapContainer' => Map::_def()) );
+    wp_localize_script( 'yamaps', 'yandex_maps', array('EditYandexMapContainer' => YandexMap::get_defaults()) );
 }
 
-add_action('media_buttons', array(__CLASS__, 'insert_yandex_map'), 12);
+
+
+add_action('media_buttons', __NAMESPACE__ . '\insert_yandex_map', 12);
 function insert_yandex_map()
 {
     /**

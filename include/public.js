@@ -60,7 +60,7 @@
     }
 });
 
-var YandexMap = new WPYandexMap();
+// var YandexMap = new WPYandexMap();
 
 // jQuery(document).ready(function($) {
 //     ymaps.ready(function() {

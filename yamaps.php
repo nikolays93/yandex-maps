@@ -34,7 +34,8 @@ require_once PLUGIN_DIR . '/vendor/autoload.php';
  */
 if(!defined(__NAMESPACE__ . '\DOMAIN')) define(__NAMESPACE__ . '\DOMAIN', Plugin::get_plugin_data('TextDomain'));
 
-include PLUGIN_DIR . '/admin/gutenberg.php';
+// include PLUGIN_DIR . '/admin/gutenberg.php';
+include PLUGIN_DIR . '/admin/mce.php';
 
 add_action( 'wp_footer', array(__NAMESPACE__ . '\Plugin', 'enqueue_scripts') );
 
