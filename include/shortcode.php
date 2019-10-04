@@ -12,10 +12,7 @@ function register_yamaps_shortcode( $args = array(), $content = '' ) {
 	$Map = new Map( $args['id'], $args );
 
 	add_shortcode( 'bullet', function ( $args = array(), $content = '' ) use ( $Map ) {
-
-		var_dump($args);
-
-		$Bullet = new Bullet( $args );
+		$Bullet = new Bullet( $args, $content );
 		$Map->addBullet( $Bullet );
 	} );
 

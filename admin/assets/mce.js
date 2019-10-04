@@ -71,7 +71,7 @@
             function htmlspecialchars(html) {
                 return html
                     .replace(/ /g, "&nbsp;")
-                    .replace(/=/g, "&eqal;")
+                    .replace(/=/g, "&equal;")
                     .replace(/&/g, "&amp;")
                     .replace(/"/g, "&apos;")
                     .replace(/"/g, "&quot;")
@@ -84,7 +84,7 @@
             });
 
             this.$body.on('keyup', function(event) {
-                placemark.properties.set('balloonContentBody', htmlspecialchars($(this).val()));
+                placemark.properties.set('balloonContentBody', $(this).val());
             });
 
             this.$footer.on('keyup', function(event) {

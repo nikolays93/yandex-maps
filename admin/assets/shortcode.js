@@ -71,17 +71,17 @@
             ymap.geoObjects.each(function(geoObject) {
                 let shortcode = {
                     tag: 'bullet',
-                    type: 'single',
+                    type: 'closed',
                     attrs : {
                         coords: geoObject.geometry.getCoordinates().join(':'),
                     }
-                }
+                };
 
                 if( geoObject.properties.get('balloonContentHeader') )
                     shortcode.attrs.title = geoObject.properties.get('balloonContentHeader');
 
                 if( geoObject.properties.get('balloonContentBody') )
-                    shortcode.attrs.body = geoObject.properties.get('balloonContentBody');
+                    shortcode.content = geoObject.properties.get('balloonContentBody');
 
                 if( geoObject.properties.get('balloonContentFooter') )
                     shortcode.attrs.footer = geoObject.properties.get('balloonContentFooter');

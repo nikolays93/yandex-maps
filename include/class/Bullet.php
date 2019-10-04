@@ -15,7 +15,7 @@ class Bullet {
 	public $opened = false;
 	public $color = '#ff0000';
 
-	function __construct( $args ) {
+	function __construct( $args, $content ) {
 		$args = wp_parse_args( $args, array_fill_keys( array(
 			'title',
 			'body',
@@ -36,7 +36,7 @@ class Bullet {
 		$this
 			->setCoords( $Coords->getCoords() )
 			->setTitle( $args['title'] )
-			->setBody( $args['body'] )
+			->setBody( $content )
 			->setFooter( $this->footer )
 			->setOpened( $args['opened'] )
 			->setColor( $args['color'] );
