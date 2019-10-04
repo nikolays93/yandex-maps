@@ -14,12 +14,12 @@ function add_mce_script()
     /**
      * Enqueue Yandex Map API
      */
-    wp_enqueue_script( Plugin::APINAME );
+    wp_enqueue_script( YandexMapCollection::APINAME );
 
     /**
      * Init Construct Yandex Map Method
      */
-    wp_enqueue_script( Plugin::PUBLICNAME );
+    wp_enqueue_script( YandexMapCollection::PUBLICNAME );
 
     /**
      * Enqueue Admin Script
