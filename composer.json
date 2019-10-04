@@ -1,7 +1,9 @@
 {
-    "~require": {
+	"require": {
         "nikolays93/wp-admin-form": "dev-master",
-        "nikolays93/wp-admin-page": "dev-master",
+        "nikolays93/wp-admin-page": "dev-master"
+    },
+    "~require": {
         "nikolays93/wp-post-metabox": "dev-master",
         "nikolays93/wp-admin-table": "dev-master"
     },
@@ -10,7 +12,7 @@
             "NikolayS93\\YandexMaps\\": "include\\class"
         }
     },
-    "~repositories": [
+    "repositories": [
         {
             "type": "git",
             "url": "https://github.com/nikolays93/wp-admin-form"
@@ -18,7 +20,9 @@
         {
             "type": "git",
             "url": "https://github.com/nikolays93/wp-admin-page"
-        },
+        }
+    ],
+    "~repositories": [
         {
             "type": "git",
             "url": "https://github.com/nikolays93/wp-post-metabox"

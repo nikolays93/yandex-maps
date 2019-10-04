@@ -2,7 +2,8 @@
 
 namespace NikolayS93\YandexMaps;
 
-use NikolayS93\PluginName\Creational\Singleton;
+use NikolayS93\YandexMaps\Creational\Singleton;
+use NikolayS93\YandexMaps\ORM\MapsCollection;
 
 class Plugin {
 

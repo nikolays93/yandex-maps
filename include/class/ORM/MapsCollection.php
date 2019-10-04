@@ -1,6 +1,6 @@
 <?php
 
-namespace NikolayS93\YandexMaps;
+namespace NikolayS93\YandexMaps\ORM;
 
 class MapsCollection implements \ArrayAccess, \Countable, \IteratorAggregate {
 

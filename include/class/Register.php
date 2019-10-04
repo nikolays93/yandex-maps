@@ -5,6 +5,7 @@ namespace NikolayS93\YandexMaps;
 use NikolayS93\WPAdminPage\Page;
 use NikolayS93\WPAdminPage\Section;
 use NikolayS93\WPAdminPage\Metabox;
+use NikolayS93\YandexMaps\ORM\MapsCollection;
 
 class Register {
 

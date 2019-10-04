@@ -54,8 +54,8 @@ add_action( 'plugins_loaded', function () {
     $Register = new Register();
     $Register->register_plugin_page();
 
-    add_action('wp_enqueue_scripts', array($Register, 'register_scripts') );
-    add_action('admin_enqueue_scripts', array($Register, 'register_scripts') );
+    add_action('wp_enqueue_scripts', array($Register, 'register_front_scripts') );
+    add_action('admin_enqueue_scripts', array($Register, 'register_front_scripts') );
 
     add_action( 'wp_footer', array(Plugin()->getCollection(), 'enqueue_scripts') );
 

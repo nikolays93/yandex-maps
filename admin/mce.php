@@ -2,6 +2,8 @@
 
 namespace NikolayS93\YandexMaps;
 
+use NikolayS93\YandexMaps\ORM\MapsCollection;
+
 /**
  * MCE Editor
  */
@@ -14,24 +16,24 @@ function add_mce_script()
     /**
      * Enqueue Yandex Map API
      */
-    wp_enqueue_script( YandexMapCollection::APINAME );
+    wp_enqueue_script( MapsCollection::API_NAME );
 
     /**
      * Init Construct Yandex Map Method
      */
-    wp_enqueue_script( YandexMapCollection::PUBLICNAME );
+    wp_enqueue_script( MapsCollection::PUBLIC_NAME );
 
     /**
      * Enqueue Admin Script
      */
-    wp_enqueue_script( 'yamaps', Plugin::get_plugin_url( '/admin/assets/mce.js' ),
-        array( 'shortcode', 'wp-util', 'jquery', Plugin::APINAME ), false, true );
-    wp_enqueue_style( 'yamaps-style', Plugin::get_plugin_url('/admin/assets/mce.css'));
+    wp_enqueue_script( 'yamaps', Plugin()->get_url( '/admin/assets/mce.js' ),
+        array( 'shortcode', 'wp-util', 'jquery', MapsCollection::API_NAME ), false, true );
+    wp_enqueue_style( 'yamaps-style', Plugin()->get_url('/admin/assets/mce.css'));
 
     /**
      * Exchange admin script properties
      */
-    wp_localize_script( 'yamaps', 'yandex_maps', array('EditYandexMapContainer' => YandexMap::get_defaults()) );
+    wp_localize_script( 'yamaps', 'yandex_maps', array('EditYandexMapContainer' => Map::getDefaults()) );
 }
 
 
@@ -43,7 +45,7 @@ function insert_yandex_map()
      * Insert Yandex Map button
      */
     printf('<a href="#" class="button button-yandex-map" id="insert-yandex-map">%s</a>',
-        __( "Добавить Яндекс карту", DOMAIN ) );
+        __( "Добавить Яндекс карту" ) );
 
     /**
      * Insert Yandex Map modal construct
