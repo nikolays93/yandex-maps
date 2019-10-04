@@ -5,7 +5,7 @@
  * @package Newproject.wordpress.plugin/
  */
 
-use NikolayS93\PluginName\Plugin;
+use NikolayS93\YandexMaps\Plugin;
 
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
     class WP_UnitTestCase extends PHPUnit\Framework\TestCase {
