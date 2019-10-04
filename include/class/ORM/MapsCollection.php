@@ -2,6 +2,8 @@
 
 namespace NikolayS93\YandexMaps\ORM;
 
+use NikolayS93\YandexMaps\Map;
+
 class MapsCollection implements \ArrayAccess, \Countable, \IteratorAggregate {
 
 	/**

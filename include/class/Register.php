@@ -84,6 +84,6 @@ class Register {
         }
 
         wp_register_script( MapsCollection::API_NAME, 'https://api-maps.yandex.ru/2.1/?lang=ru_RU', array(), '', true );
-        wp_register_script( MapsCollection::PUBLIC_NAME, Plugin()->get_url('/include/public.js'), array('jquery'), '', true );
+        wp_register_script( MapsCollection::PUBLIC_NAME, Plugin()->get_url('/public.js'), array('jquery'), '', true );
     }
 }

@@ -16,6 +16,14 @@ class Bullet {
 	public $color = '#ff0000';
 
 	function __construct( $args ) {
+		$args = wp_parse_args( $args, array_fill_keys( array(
+			'title',
+			'body',
+			'footer',
+			'opened',
+			'color'
+		), '' ) );
+
 		if ( empty( $args['coords'] ) ) {
 			return new \WP_Error( 'MISSING', 'Coords is empty' );
 		}
@@ -25,31 +33,17 @@ class Bullet {
 			return new \WP_Error( 'INCORRECT', 'Coords is incorrect' );
 		}
 
-		$this->coords = $Coords->getCoords();
+		$this
+			->setCoords( $Coords->getCoords() )
+			->setTitle( $args['title'] )
+			->setBody( $args['body'] )
+			->setFooter( $this->footer )
+			->setOpened( $args['opened'] )
+			->setColor( $args['color'] );
+	}
 
-		if ( ! empty( $args['title'] ) ) {
-			$this->title = sanitize_text_field( $args['title'] );
-		}
-
-		if ( ! empty( $args['body'] ) ) {
-			$this->body = sanitize_text_field( $args['body'] );
-		}
-
-		if ( ! empty( $args['footer'] ) ) {
-			$this->footer = sanitize_text_field( $args['footer'] );
-		}
-
-		if ( ! empty( $args['opened'] ) ) {
-			$this->opened = (bool) $args['opened'];
-		}
-
-		if ( ! empty( $args['color'] ) ) {
-			if ( '#' !== substr( $args['color'], 0, 1 ) ) {
-				$args['color'] = '#' . $args['color'];
-			}
-
-			$this->color = esc_attr( $args['color'] );
-		}
+	static function esc_html_entities( $str ) {
+		return str_replace( array( '&#187;', '&#8243;' ), '', $str );
 	}
 
 	/**
@@ -93,4 +87,74 @@ class Bullet {
 	public function getColor() {
 		return $this->color;
 	}
+
+	/**
+	 * @param mixed|string $title
+	 */
+	public function setTitle( $title ) {
+		if ( $title = static::esc_html_entities( $title ) ) {
+			$this->title = $title;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param string $body
+	 */
+	public function setBody( $body ) {
+		if ( $body = static::esc_html_entities( $body ) ) {
+			$this->body = $body;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param string $footer
+	 */
+	public function setFooter( $footer ) {
+		if ( $footer = static::esc_html_entities( $footer ) ) {
+			$this->footer = $footer;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param array|bool $coords
+	 */
+	public function setCoords( $coords ) {
+		if ( $coords = static::esc_html_entities( $coords ) ) {
+			$this->coords = $coords;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param bool $opened
+	 */
+	public function setOpened( $opened ) {
+		$this->opened = (bool) static::esc_html_entities( $opened );
+
+		return $this;
+	}
+
+	/**
+	 * @param string|void $color
+	 */
+	public function setColor( $color ) {
+		if ( $color = static::esc_html_entities( $color ) ) {
+			if ( '#' !== substr( $color, 0, 1 ) ) {
+				$color = '#' . $color;
+			}
+
+			$this->color = $color;
+		}
+
+		return $this;
+	}
+
+
 }

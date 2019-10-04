@@ -25,8 +25,9 @@ if ( ! defined( __NAMESPACE__ . '\PLUGIN_DIR' ) ) {
 }
 
 require_once ABSPATH . "wp-admin/includes/plugin.php";
-if ( ! include_once PLUGIN_DIR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php' ) {
+if ( ! @include_once PLUGIN_DIR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php' ) {
     include PLUGIN_DIR . 'include/class/Creational/Singleton.php';
+    include PLUGIN_DIR . 'include/class/ORM/MapsCollection.php';
     include PLUGIN_DIR . 'include/class/Plugin.php';
     include PLUGIN_DIR . 'include/class/Register.php';
 }
@@ -56,6 +57,8 @@ add_action( 'plugins_loaded', function () {
 
     add_action('wp_enqueue_scripts', array($Register, 'register_front_scripts') );
     add_action('admin_enqueue_scripts', array($Register, 'register_front_scripts') );
+
+    add_shortcode( 'yamap', __NAMESPACE__ . '\register_yamaps_shortcode' );
 
     add_action( 'wp_footer', array(Plugin()->getCollection(), 'enqueue_scripts') );
 

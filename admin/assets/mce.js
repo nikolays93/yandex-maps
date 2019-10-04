@@ -1,93 +1,6 @@
 /* global tinyMCE */
 
 (function($) {
-    // if( WPYandexMap ) return;
-
-    WPYandexMap = function( handle, args ) {
-
-        this.placemarks = [];
-
-        this.args = {
-            center: null,
-            zoom: null,
-            controls: []
-        };
-
-        if( args.center ) this.args.center = this.escCoords( args.center );
-        if( args.zoom )   this.args.zoom = parseInt( args.zoom );
-
-        this.mapInstance = new ymaps.Map(handle, this.args);
-        console.log('Yandex map created')
-    }
-
-    window.WPYandexMap.prototype =
-    {
-        escCoords: function( coords )
-        {
-            if( 'string' == typeof(coords) ) {
-                coords.split(':');
-            }
-
-            return coords;
-        },
-
-        insertPlacemark: function( placemark )
-        {
-            placemark = placemark || {};
-            let coords = this.escCoords( placemark.coords || false );
-            let bullet = {};
-            let options = {};
-
-            if( coords ) {
-                if( placemark.title )  bullet.balloonContentHeader = placemark.title;
-                if( placemark.body )   bullet.balloonContentBody   = placemark.body;
-                if( placemark.footer ) bullet.balloonContentFooter = placemark.footer;
-
-                if( placemark.color ) options.iconColor           = placemark.color;
-
-                let newPlacemark = new ymaps.Placemark(coords, bullet, options);
-
-                this.mapInstance.geoObjects.add( newPlacemark );
-                if( placemark.title || placemark.body || placemark.footer ) {
-                    newPlacemark.balloon.open();
-                }
-            }
-        },
-
-        getControls() {
-            return $.map(this.mapInstance.controls[ '_controlKeys' ], function(item, index) {
-                return item;
-            });
-        },
-    }
-
-    const shortcode_string = 'yamap';
-
-    yandex_maps = yandex_maps || {};
-
-    function tmce_insertContent(content, editor_id, textarea_id) {
-        if ( typeof editor_id == 'undefined' ) editor_id = wpActiveEditor;
-        if ( typeof textarea_id == 'undefined' ) textarea_id = editor_id;
-
-        if ( jQuery('#wp-'+editor_id+'-wrap').hasClass('tmce-active') && tinyMCE.get(editor_id) ) {
-            return tinyMCE.get(editor_id).insertContent(content);
-        } else {
-            return jQuery('#'+textarea_id).val(jQuery('#'+textarea_id).val() + content);
-        }
-    }
-
-    function changeControls(ymap, e, $input) {
-        e.preventDefault();
-
-        let name = $input.attr('name');
-
-        if( $input.is(':checked') ) {
-            ymap.controls.add( name );
-        }
-        else {
-            ymap.controls.remove( name );
-        }
-    }
 
     var Modal = new wp.media.view.Modal({
         controller: { trigger: function() {} }
@@ -153,19 +66,29 @@
             this.$footer.val( placemark.properties.get('balloonContentFooter') );
 
             this.$color.val( placemark.options.get('iconColor') );
-            console.log( placemark.options.get('opened') );
-            this.$opened.prop('checked', 1 == placemark.options.get('opened') ? true : false);
+            this.$opened.prop('checked', true == placemark.options.get('opened') ? true : false);
+
+            function htmlspecialchars(html) {
+                return html
+                    .replace(/ /g, "&nbsp;")
+                    .replace(/=/g, "&eqal;")
+                    .replace(/&/g, "&amp;")
+                    .replace(/"/g, "&apos;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/</g, "&lt;");
+            }
 
             this.$header.on('keyup', function(event) {
-                placemark.properties.set('balloonContentHeader', $(this).val());
+                placemark.properties.set('balloonContentHeader', htmlspecialchars($(this).val()));
             });
 
             this.$body.on('keyup', function(event) {
-                placemark.properties.set('balloonContentBody', $(this).val());
+                placemark.properties.set('balloonContentBody', htmlspecialchars($(this).val()));
             });
 
             this.$footer.on('keyup', function(event) {
-                placemark.properties.set('balloonContentFooter', $(this).val());
+                placemark.properties.set('balloonContentFooter', htmlspecialchars($(this).val()));
             });
 
 
@@ -203,7 +126,7 @@
             this.__clear();
             this.$delete_button.hide();
         }
-    }
+    };
 
     function OpenYandexMapWindow(handle, properties) {
         Modal.content( new ModalContent() );
@@ -263,12 +186,20 @@
             });
 
             $controls.on('change', function(event) {
-                let $self = $(this);
+                event.preventDefault();
 
-                changeControls(ymap, event, $self);
+                if( $(this).is(':checked') ) {
+                    ymap.controls.add( $(this).attr('name') );
+                }
+                else {
+                    ymap.controls.remove( $(this).attr('name') );
+                }
             });
 
-            let controls = WPYMap.getControls();
+            let controls = $.map(WPYMap.mapInstance.controls[ '_controlKeys' ], function(item, index) {
+                return item;
+            });
+
             $controls.each(function(index, el) {
                 if(-1 !== $.inArray($(this).attr('name'), controls) ) {
                     $(this).prop('checked', true);
@@ -289,120 +220,9 @@
     $('#insert-yandex-map').on('click', function(event) {
         event.preventDefault();
 
-        $.each(yandex_maps, function(handle, properties) {
+        $.each(yandex_maps || {}, function(handle, properties) {
             OpenYandexMapWindow(handle, properties);
         });
     });
 
-    try {
-
-        /**
-         * Shortcode
-         */
-        wp.mce = wp.mce || {};
-        wp.mce.yamap = {
-            findSubShortcodes: function(shortcode, content, subShortcodes) {
-                subShortcodes = subShortcodes || [];
-                var subShortcode = wp.shortcode.next(shortcode, content);
-
-                if( subShortcode && subShortcode.content ) {
-                    var before = content;
-                    content = content.replace(subShortcode.content, '');
-                    subShortcodes.push( subShortcode );
-
-                    if( before != content )
-                        return this.findSubShortcodes( shortcode, content, subShortcodes );
-                }
-
-                return subShortcodes;
-            },
-            getContent: function() {
-                // Контент внутри объекта
-                return '<p style="text-align: center;">[Yandex Карта]</p>';
-            },
-            edit: function( data ) {
-                var shortcode_data = wp.shortcode.next(shortcode_string, data);
-                var values = shortcode_data.shortcode.attrs.named;
-                var val = {};
-
-                $.each(yandex_maps, function(handle, properties) {
-                    val = properties;
-                });
-
-                // parse bullets
-                $.each(this.findSubShortcodes('bullet', shortcode_data.shortcode.content), function(index, el) {
-                    val.bullets.push( {
-                        coords: el.shortcode.attrs.named.coords.split(':'),
-                        title: el.shortcode.attrs.named.title || ''
-                    } );
-                });
-
-                if( values.center ) val.center = values.center.split(':');
-                if( values.zoom ) val.zoom = values.zoom;
-                if( values.height ) val.height = values.height;
-                if( values.controls ) val.controls = values.controls;
-
-                // init modal
-                OpenYandexMapWindow('EditYandexMapContainer', val);
-            },
-            submit: function(editor, ymap, values) {
-                values = values || [];
-
-                var content = '';
-                var args = {
-                    tag : shortcode_string,
-                    attrs : {
-                        zoom : values.zoom,
-                        center : values.center,
-                        height: values.height,
-                    }
-                };
-
-                var controls = $.map(ymap.controls[ '_controlKeys' ], function(item, index) {
-                    return item;
-                });
-
-                if( controls.join(',') != 'zoomControl,searchControl' ) {
-                    args.attrs.controls = controls.join(',');
-                }
-
-                ymap.geoObjects.each(function(geoObject) {
-                    let shortcode = {
-                        tag: 'bullet',
-                        type: 'single',
-                        attrs : {
-                            coords: geoObject.geometry.getCoordinates().join(':'),
-                        }
-                    }
-
-                    if( geoObject.properties.get('balloonContentHeader') )
-                        shortcode.attrs.title = geoObject.properties.get('balloonContentHeader');
-
-                    if( geoObject.properties.get('balloonContentBody') )
-                        shortcode.attrs.body = geoObject.properties.get('balloonContentBody');
-
-                    if( geoObject.properties.get('balloonContentFooter') )
-                        shortcode.attrs.footer = geoObject.properties.get('balloonContentFooter');
-
-                    if( geoObject.options.get('iconColor') )
-                        shortcode.attrs.color = geoObject.options.get('iconColor');
-
-                    if( 1 == geoObject.options.get('opened') )
-                        shortcode.attrs.opened = 'true';
-
-                    content += wp.shortcode.string( shortcode );
-                });
-
-                args.content = content;
-
-                tmce_insertContent(wp.shortcode.string( args ));
-            }
-        };
-
-        wp.mce.views.register( shortcode_string, wp.mce.yamap );
-
-    } catch(e) {
-        // statements
-        console.log(e);
-    }
 }(jQuery));

@@ -26,14 +26,16 @@ function add_mce_script()
     /**
      * Enqueue Admin Script
      */
-    wp_enqueue_script( 'yamaps', Plugin()->get_url( '/admin/assets/mce.js' ),
+    wp_enqueue_script( 'yamaps-mce', Plugin()->get_url( '/admin/assets/mce.js' ),
+        array( 'shortcode', 'wp-util', 'jquery', MapsCollection::API_NAME ), false, true );
+    wp_enqueue_script( 'yamaps-sc', Plugin()->get_url( '/admin/assets/shortcode.js' ),
         array( 'shortcode', 'wp-util', 'jquery', MapsCollection::API_NAME ), false, true );
     wp_enqueue_style( 'yamaps-style', Plugin()->get_url('/admin/assets/mce.css'));
 
     /**
      * Exchange admin script properties
      */
-    wp_localize_script( 'yamaps', 'yandex_maps', array('EditYandexMapContainer' => Map::getDefaults()) );
+    wp_localize_script( 'yamaps-mce', 'yandex_maps', array('EditYandexMapContainer' => Map::getDefaults()) );
 }
 
 
