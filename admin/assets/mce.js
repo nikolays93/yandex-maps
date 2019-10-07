@@ -1,5 +1,7 @@
 /* global tinyMCE */
 
+var OpenYandexMapWindow;
+
 (function($) {
 
     var Modal = new wp.media.view.Modal({
@@ -128,7 +130,7 @@
         }
     };
 
-    function OpenYandexMapWindow(handle, properties) {
+    OpenYandexMapWindow = function(handle, properties) {
         Modal.content( new ModalContent() );
         Modal.open();
 
@@ -140,8 +142,13 @@
 
             // insert exists placemarks
             if( properties.placemarks ) {
-                properties.placemarks.each(function(i, placemark) {
-                    WPYMap.insertPlacemark( placemark );
+                $.each(properties.placemarks, function(index, placemark) {
+                    var obPlacemark = WPYMap.insertPlacemark( placemark );
+                    if( obPlacemark ) {
+                        obPlacemark.events.add('click', function() {
+                            Sidebar.open( ymap, obPlacemark );
+                        });
+                    }
                 });
             }
 
@@ -151,13 +158,8 @@
 
                 ymap.geoObjects.add( placemark );
 
-                /**
-                 * New placemarks opened as default
-                 */
-                placemark.options.set('opened', 1);
-
                 Sidebar.open( ymap, placemark );
-                placemark.events.add('click', function(e) {
+                placemark.events.add('click', function() {
                     Sidebar.open( ymap, placemark );
                 });
             });
@@ -201,7 +203,7 @@
             });
 
             $controls.each(function(index, el) {
-                if(-1 !== $.inArray($(this).attr('name'), controls) ) {
+                if( -1 !== $.inArray($(this).attr('name'), controls) ) {
                     $(this).prop('checked', true);
                 }
             });
@@ -212,14 +214,13 @@
                     zoom: document.getElementsByName('zoom')[0].value,
                     height: document.getElementsByName('height')[0].value
                 } );
+
                 Modal.close();
             });
         });
     }
 
-    $('#insert-yandex-map').on('click', function(event) {
-        event.preventDefault();
-
+    $('.postbox-container').on('click', '.button-yandex-map', function(event) {
         $.each(yandex_maps || {}, function(handle, properties) {
             OpenYandexMapWindow(handle, properties);
         });

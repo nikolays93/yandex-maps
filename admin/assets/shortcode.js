@@ -18,35 +18,42 @@
 
             return subShortcodes;
         },
+
         getContent: function() {
             // Контент внутри объекта
             return '<p style="text-align: center;">[Yandex Карта]</p>';
         },
+
         edit: function( data ) {
             var shortcode_data = wp.shortcode.next(shortcode_string, data);
-            var values = shortcode_data.shortcode.attrs.named;
-            var val = {};
+            var existsProperties = shortcode_data.shortcode.attrs.named;
 
-            $.each(yandex_maps, function(handle, properties) {
-                val = properties;
-            });
+            var handle = 'EditYandexMapContainer';
+            var mapProperties = yandex_maps[ handle ] || {placemarks: []};
+            if( !mapProperties.placemarks ) {
+                mapProperties.placemarks = [];
+            }
 
-            // parse bullets
+            // parse placemarks
             $.each(this.findSubShortcodes('bullet', shortcode_data.shortcode.content), function(index, el) {
-                val.bullets.push( {
+                mapProperties.placemarks.push( {
                     coords: el.shortcode.attrs.named.coords.split(':'),
-                    title: el.shortcode.attrs.named.title || ''
+                    title: el.shortcode.attrs.named.title || '',
+                    body: el.shortcode.content,
+                    footer: el.shortcode.attrs.named.footer || ''
                 } );
             });
 
-            if( values.center ) val.center = values.center.split(':');
-            if( values.zoom ) val.zoom = values.zoom;
-            if( values.height ) val.height = values.height;
-            if( values.controls ) val.controls = values.controls;
+            if( existsProperties.center ) mapProperties.center = existsProperties.center.split(':');
+            if( existsProperties.zoom ) mapProperties.zoom = existsProperties.zoom;
+            if( existsProperties.height ) mapProperties.height = existsProperties.height;
+            if( existsProperties.controls ) mapProperties.controls = existsProperties.controls;
 
             // init modal
-            OpenYandexMapWindow('EditYandexMapContainer', val);
+            OpenYandexMapWindow(handle, mapProperties);
         },
+
+        // todo refactor
         submit: function(editor, ymap, values) {
             values = values || [];
 
@@ -64,6 +71,7 @@
                 return item;
             });
 
+            // setup controls when controls not default
             if( controls.join(',') != 'zoomControl,searchControl' ) {
                 args.attrs.controls = controls.join(',');
             }
@@ -77,20 +85,25 @@
                     }
                 };
 
-                if( geoObject.properties.get('balloonContentHeader') )
+                if( geoObject.properties.get('balloonContentHeader') ) {
                     shortcode.attrs.title = geoObject.properties.get('balloonContentHeader');
+                }
 
-                if( geoObject.properties.get('balloonContentBody') )
+                if( geoObject.properties.get('balloonContentBody') ) {
                     shortcode.content = geoObject.properties.get('balloonContentBody');
+                }
 
-                if( geoObject.properties.get('balloonContentFooter') )
+                if( geoObject.properties.get('balloonContentFooter') ) {
                     shortcode.attrs.footer = geoObject.properties.get('balloonContentFooter');
+                }
 
-                if( geoObject.options.get('iconColor') )
+                if( geoObject.options.get('iconColor') ) {
                     shortcode.attrs.color = geoObject.options.get('iconColor');
+                }
 
-                if( 1 == geoObject.options.get('opened') )
+                if( 1 == geoObject.options.get('opened') ) {
                     shortcode.attrs.opened = 'true';
+                }
 
                 content += wp.shortcode.string( shortcode );
             });
@@ -101,10 +114,10 @@
             if ( typeof editor_id == 'undefined' ) editor_id = wpActiveEditor;
             if ( typeof textarea_id == 'undefined' ) textarea_id = editor_id;
 
-            if ( jQuery('#wp-'+editor_id+'-wrap').hasClass('tmce-active') && tinyMCE.get(editor_id) ) {
+            if ( $('#wp-'+editor_id+'-wrap').hasClass('tmce-active') && tinyMCE.get(editor_id) ) {
                 return tinyMCE.get(editor_id).insertContent(content);
             } else {
-                var $textarea = jQuery('#'+textarea_id);
+                var $textarea = $('#' + textarea_id);
                 return $textarea.val($textarea.val() + content);
             }
         }

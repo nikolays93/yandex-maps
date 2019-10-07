@@ -29,6 +29,7 @@
         let coords = this.escCoords( placemark.coords || false );
         let bullet = {};
         let options = {};
+        var newPlacemark = false;
 
         if( coords ) {
             if( placemark.title )  bullet.balloonContentHeader = placemark.title;
@@ -37,13 +38,15 @@
 
             if( placemark.color ) options.iconColor           = placemark.color;
 
-            let newPlacemark = new ymaps.Placemark(coords, bullet, options);
+            var newPlacemark = new ymaps.Placemark(coords, bullet, options);
 
             this.mapInstance.geoObjects.add( newPlacemark );
-            if( placemark.title || placemark.body || placemark.footer ) {
+            if( placemark.opened && (placemark.title || placemark.body || placemark.footer) ) {
                 newPlacemark.balloon.open();
             }
         }
+
+        return newPlacemark;
     };
 })(window);
 
