@@ -164,6 +164,19 @@ var OpenYandexMapWindow;
                 });
             });
 
+            var searchControl = ymap.controls.get('searchControl');
+            searchControl.events.add("resultshow", function (e) {
+                searchControl.hideResult();
+                var placemark = new ymaps.Placemark( searchControl.getResultsArray()[0].geometry.getCoordinates() );
+
+                ymap.geoObjects.add( placemark );
+
+                Sidebar.open( ymap, placemark );
+                placemark.events.add('click', function() {
+                    Sidebar.open( ymap, placemark );
+                });
+            });
+
             /**
              * change zoom/coordinates
              */
@@ -220,7 +233,7 @@ var OpenYandexMapWindow;
         });
     }
 
-    $('.postbox-container').on('click', '.button-yandex-map', function(event) {
+    $('#post').on('click', '.button-yandex-map', function(event) {
         $.each(yandex_maps || {}, function(handle, properties) {
             OpenYandexMapWindow(handle, properties);
         });

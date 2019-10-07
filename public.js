@@ -56,6 +56,9 @@ if( typeof yandex_maps !== "undefined" ) {
             var WPYMap = new WPYandexMap(document.getElementById(mapKey), yandex_maps[mapKey]);
             var placemarks = yandex_maps[mapKey].bullets;
 
+            // @todo
+            // WPYMap.mapInstance.behaviors.disable(['drag', 'scrollZoom']);
+
             Object.keys(placemarks || []).map(function(placemarkKey, index) {
                 WPYMap.insertPlacemark( placemarks[placemarkKey] );
             });
