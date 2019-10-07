@@ -53,7 +53,7 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\Plugin', 10 );
 add_action( 'plugins_loaded', function () {
 
     $Register = new Register();
-    // $Register->register_plugin_page();
+    $Register->register_plugin_page();
 
     add_action('wp_enqueue_scripts', array($Register, 'register_front_scripts') );
     add_action('admin_enqueue_scripts', array($Register, 'register_front_scripts') );

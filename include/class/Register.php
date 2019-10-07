@@ -37,12 +37,12 @@ class Register {
 
         $Page = new Page(
             $Plugin->get_option_name(),
-            __( 'New Plugin name Title', Plugin::DOMAIN ),
+            __( 'Yandex maps API settings page', Plugin::DOMAIN ),
             array(
-                'parent'      => '', // for ex. woocommerce
-                'menu'        => __( 'Example', Plugin::DOMAIN ),
+                'parent'      => 'options-general.php', // for ex. woocommerce
+                'menu'        => __( 'Yandex maps API', Plugin::DOMAIN ),
                 'permissions' => $Plugin->get_permissions(),
-                'columns'     => 2,
+                'columns'     => 1,
                 // 'validate'    => array($this, 'validate_options'),
             )
         );
@@ -53,26 +53,26 @@ class Register {
             }
         } );
 
-        if ( $template = $Plugin->get_template( 'admin/template/section' ) ) {
-            $Page->add_section( new Section(
-                'section',
-                __( 'Section', Plugin::DOMAIN ),
-                $template
-            ) );
-        }
+        // if ( $template = $Plugin->get_template( 'admin/template/section' ) ) {
+        //     $Page->add_section( new Section(
+        //         'section',
+        //         __( 'Section', Plugin::DOMAIN ),
+        //         $template
+        //     ) );
+        // }
 
-        if ( $template = $Plugin->get_template( 'admin/template/metabox' ) ) {
-            $Page->add_metabox( new Metabox(
-                'metabox',
-                __( 'MetaBox', Plugin::DOMAIN ),
-                $template,
-                $position = 'side',
-                $priority = 'high'
-            ) );
-        }
+        // if ( $template = $Plugin->get_template( 'admin/template/metabox' ) ) {
+        //     $Page->add_metabox( new Metabox(
+        //         'metabox',
+        //         __( 'MetaBox', Plugin::DOMAIN ),
+        //         $template,
+        //         $position = 'side',
+        //         $priority = 'high'
+        //     ) );
+        // }
 
-        $Page->set_assets( function () use ( $Plugin ) {
-        } );
+        // $Page->set_assets( function () use ( $Plugin ) {
+        // } );
 
         return $Page;
     }
@@ -83,7 +83,13 @@ class Register {
             return false;
         }
 
-        wp_register_script( MapsCollection::API_NAME, 'https://api-maps.yandex.ru/2.1/?lang=ru_RU', array(), '', true );
+        $args = array('lang=ru_RU');
+        if( $api = Plugin()->get_setting( 'YAMAPS_API', '' ) ) {
+            $args[] = 'apikey=' . $api;
+        }
+
+        wp_register_script( MapsCollection::API_NAME, 'https://api-maps.yandex.ru/2.1/?' . implode('&', $args), array(),
+            '', true );
         wp_register_script( MapsCollection::PUBLIC_NAME, Plugin()->get_url('/public.js'), array('jquery'), '', true );
     }
 }
