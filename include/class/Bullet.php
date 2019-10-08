@@ -43,7 +43,7 @@ class Bullet {
 	}
 
 	static function esc_html_entities( $str ) {
-		return str_replace( array( '&#187;', '&#8243;' ), '', $str );
+		return str_replace( array( '&#34;', '&#187;', '&#8243;', '&#8220;', '&#8221;', '&#8222;'), '', $str );
 	}
 
 	/**
