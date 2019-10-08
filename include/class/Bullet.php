@@ -136,7 +136,7 @@ class Bullet {
 	 * @param bool $opened
 	 */
 	public function setOpened( $opened ) {
-		$this->opened = (bool) static::esc_html_entities( $opened );
+		$this->opened = "true" === static::esc_html_entities( $opened );
 
 		return $this;
 	}
