@@ -19,6 +19,9 @@ window.WPYandexMap.prototype.escCoords = function( coords ) {
     if( 'string' == typeof(coords) ) {
         coords.split(':');
     }
+    else if( typeof coords === "object" && !Array.isArray(coords) && coords !== null ) {
+        coords = [coords[0], coords[1]];
+    }
 
     return coords;
 };
