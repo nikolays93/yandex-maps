@@ -4,7 +4,7 @@
  * Plugin Name: Wordpress Yandex Maps
  * Plugin URI: https://github.com/nikolays93/yandex-maps/
  * Description: <a href="https://tech.yandex.ru/maps/doc/jsapi/2.1/terms/index-docpage/">Условия использования</a> Яндекс карт
- * Version: 1.0
+ * Version: 1.1
  * Author: NikolayS93
  * Author URI: https://vk.com/nikolays_93
  * Author EMAIL: NikolayS93@ya.ru
